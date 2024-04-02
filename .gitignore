@@ -1,0 +1,8 @@
+virt/
+*.txt
+*.vscode
+static files/
+package/
+For packaging/
+!requirements.txt
+__pychache__/

@@ -87,9 +87,11 @@ class CoveredParkingSSEThread(QThread):
                 for line in response.iter_lines():
                     if line:
                         data = line.decode('utf-8')[2:-1]
-                        self.message.emit(data)
+                    self.message.emit(data)
+                    print(data)
             else:
                 print("Failed to connect to SSE endpoint")
+
 
 class ManualParkingEntryThread(QThread):
     list_received = pyqtSignal(list)

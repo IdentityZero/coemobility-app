@@ -6,3 +6,5 @@ package/
 For packaging/
 !requirements.txt
 __pychache__/
+*.pyc
+client/

@@ -183,13 +183,11 @@ class LoginWindow(QMainWindow):
         self.main_window.websocket_worker.start()    
 
         #SSE
-        t = datetime.now().timestamp()
-        self.main_window.sse_worker = CoveredParkingSSEThread()
-        self.main_window.sse_worker.message.connect(self.main_window.handle_covered_parking_status)
-        self.main_window.sse_worker.start()
-        t1 = datetime.now().timestamp()
 
         self.main_window.loadApplication()
+
+        self.main_window.sse_worker = CoveredParkingSSEThread()
+        self.main_window.sse_worker.message.connect(self.main_window.handle_covered_parking_status)
 
 class MainWindow(QMainWindow):
     def __init__(self, UI_FOLDER):
@@ -245,6 +243,8 @@ class MainWindow(QMainWindow):
 
             self.loadApplicationThread.wait()
             del self.loadApplicationThread
+            # Start the SSE worker for automatic updating of the covered parkings
+            self.sse_worker.start()
 
     def backgroundTask(self):
         # removal of entries

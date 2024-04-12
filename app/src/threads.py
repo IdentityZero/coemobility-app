@@ -48,6 +48,7 @@ class SetUpThread(QThread):
 
         self.finished.emit("Finished")
 
+
 class WebSocketClientThread(QThread):
     data_received = pyqtSignal(str)
 
@@ -73,6 +74,7 @@ class WebSocketClientThread(QThread):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(self.connect_to_websocket())
 
+
 class CoveredParkingSSEThread(QThread):
     message = pyqtSignal(str)
 
@@ -88,13 +90,12 @@ class CoveredParkingSSEThread(QThread):
                     if line:
                         data = line.decode('utf-8')[2:-1]
                     self.message.emit(data)
-                    print(data)
             else:
                 print("Failed to connect to SSE endpoint")
 
 
 class ManualParkingEntryThread(QThread):
-    list_received = pyqtSignal(list)
+    connection_status = pyqtSignal(str)
 
     def __init__(self,queue):
         super(ManualParkingEntryThread, self).__init__()
@@ -126,6 +127,10 @@ class ManualParkingEntryThread(QThread):
                 while entry != 0:
                     # if successful post entry returns 0
                     entry = self.post_entry(message,self.post_endpoint, self.headers)
+                    if entry == 1:
+                        print("Emitting")
+                        self.connection_status.emit("No internet connection!")
+                    time.sleep(3)
                 
             time.sleep(1)
     
@@ -158,8 +163,10 @@ class ManualParkingEntryThread(QThread):
 
         try:
             response = self.session.post(endpoint, json=post_data, headers=headers)
+            if response.status_code != 201:
+                return 1
             return 0 
-        except requests.exceptions.Timeout:
+        except:
             print("Connection timeout")
             return 1
 

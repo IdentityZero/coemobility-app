@@ -24,7 +24,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>40</y>
+      <y>60</y>
       <width>1201</width>
       <height>571</height>
      </rect>
@@ -522,6 +522,32 @@ background-color: #ABA49B;
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QLabel" name="announcementLabel">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>1201</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:#dc3545;
+border-radius:10px;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>entryGroup</zorder>
    <zorder>exitGroup</zorder>
    <zorder>rfid</zorder>
@@ -530,6 +556,7 @@ background-color: #ABA49B;
    <zorder>availableParkingSpaceStackedWidget</zorder>
    <zorder>available_space_title</zorder>
    <zorder>covered_parking_title</zorder>
+   <zorder>announcementLabel</zorder>
   </widget>
   <action name="actionPreferences">
    <property name="text">

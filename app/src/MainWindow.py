@@ -203,6 +203,7 @@ class MainWindow(QMainWindow):
         self.get_config()
         self.init_UI(self.UI_FOLDER)
         self.init_tables()
+        self.announcementLabel.hide()
 
     def loadApplication(self):
         """
@@ -352,6 +353,7 @@ class MainWindow(QMainWindow):
 
         self.manualParkingEntryThread = ManualParkingEntryThread(self.manualParkingButtonPressedQueue)
         self.manualParkingEntryThread.start()
+        self.manualParkingEntryThread.connection_status.connect(self.send_announcement)
         self.parkingLayoutFrame.setLayout(self.my_parking_layout)
 
     def get_config(self):
@@ -379,17 +381,19 @@ class MainWindow(QMainWindow):
             self.locationImage.deleteLater()
             self.locationImage = areaLocationImage
 
-
         else:
             self.availableParkingSpaceStackedWidget.setCurrentIndex(0)
 
+
     def handleManualButtonPressed(self,message):
         self.manualParkingButtonPressedQueue.put(message)
+
 
     def handleSettings(self):
         self.settings_window = SettingsWidget(self.UI_FOLDER)
         self.settings_window.widget_closed.connect(self.handle_settings_closed)
         self.settings_window.show()
+
 
     def handle_settings_closed(self, message):
         if message == "Appearance":
@@ -398,6 +402,7 @@ class MainWindow(QMainWindow):
         elif message == "Exit":
             self.close()
 
+
     def handle_covered_parking_status(self, message):
         data = json.loads(message)
         area = data["area"]
@@ -405,6 +410,7 @@ class MainWindow(QMainWindow):
         state = data["state"]
         time = data["time"]
         self.coveredParkings[area].setSpaceState(id_area,state)
+
 
     def handle_web_socket_reply(self, message):
         json_message = json.loads(message)
@@ -453,6 +459,12 @@ class MainWindow(QMainWindow):
         if category is not None:
             set = f'{role}_{category}'
             self.my_parking_layout.setCounterValue(role,category,action)
+
+
+    def send_announcement(self,message):
+        self.announcementLabel.show()
+        self.announcementLabel.setText(str(message))
+        self.announcementLabel.update()
 
     # Entry point
     def getRFID(self):

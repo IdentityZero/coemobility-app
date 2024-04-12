@@ -38,8 +38,8 @@ PROFILE_CATEGORYV2 = "profile_pics"
 # DOMAIN_NAME_RAW = "192.168.55.105:8000/"
 # DOMAIN_NAME_RAW = "coemobility.com/"
 DOMAIN_NAME_RAW = "coemobility.com/"
-DOMAIN_NAME = "http://" + DOMAIN_NAME_RAW
-DOMAIN_NAME_ASGI = "http://" + DOMAIN_NAME_RAW 
+DOMAIN_NAME = "https://" + DOMAIN_NAME_RAW
+DOMAIN_NAME_ASGI = "https://" + DOMAIN_NAME_RAW 
 
 IMAGE_CSV_DOWNLOAD_ENDPOINT = DOMAIN_NAME + "api/download-csv/"
 MEDIA_DOWNLOAD_URL = DOMAIN_NAME + "media/"

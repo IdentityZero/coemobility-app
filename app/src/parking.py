@@ -131,6 +131,7 @@ def init_coveredParkingStatus():
     url = settings.COVERED_PARKING_STATUS
 
     response = requests.get(url)
+    print(response)
     data = response.json()
 
     return data

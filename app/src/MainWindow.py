@@ -19,7 +19,7 @@ import settings
 from parking import Entry, CoveredParking, coveredParkingNames, init_coveredParkingStatus, Parking, init_parking_status
 from widgets import SettingsWidget, ParkingGridLayout
 from utils import ImageManager, retrieveToken, storeToken,labelToPixMap,ImageManagerV2,timeit
-from threads import WebSocketClientThread, CoveredParkingSSEThread,ManualParkingEntryThread, SetUpThread
+from threads import WebSocketClientThread, CoveredParkingSSEThread,ManualParkingEntryThread, SetUpThread,RetrieveRfidEntriesThread
 
 # for pyqt5 resource files
 QResource.registerResource(f"{settings.STATIC_FOLDER}/static.rcc")
@@ -189,6 +189,7 @@ class LoginWindow(QMainWindow):
         self.main_window.sse_worker = CoveredParkingSSEThread()
         self.main_window.sse_worker.message.connect(self.main_window.handle_covered_parking_status)
 
+
 class MainWindow(QMainWindow):
     def __init__(self, UI_FOLDER):
 
@@ -204,6 +205,10 @@ class MainWindow(QMainWindow):
         self.init_UI(self.UI_FOLDER)
         self.init_tables()
         self.announcementLabel.hide()
+        
+        self.retrieveRFID = RetrieveRfidEntriesThread()
+        self.retrieveRFID.rfid_data.connect(self.getRFID)
+        
 
     def loadApplication(self):
         """
@@ -219,6 +224,7 @@ class MainWindow(QMainWindow):
         self.loadApplicationThread = SetUpThread(functions=functions)
         self.loadApplicationThread.finished.connect(self.handle_loadApplication)
         self.loadApplicationThread.start()
+
 
     def handle_loadApplication(self,payload):
         if payload == "Finished":
@@ -246,6 +252,8 @@ class MainWindow(QMainWindow):
             del self.loadApplicationThread
             # Start the SSE worker for automatic updating of the covered parkings
             self.sse_worker.start()
+            self.retrieveRFID.start()
+
 
     def backgroundTask(self):
         # removal of entries
@@ -254,12 +262,8 @@ class MainWindow(QMainWindow):
 
         # Parking Bay
 
-    def init_variables(self):
 
-        # External
-        EXPIRE_TIME = 3
-        self.entrance_entry = Entry(EXPIRE_TIME)
-        self.exit_entry = Entry(EXPIRE_TIME)
+    def init_variables(self):
 
         # Internal
         DEFAULT_COLUMN_WIDTH = 230
@@ -278,13 +282,17 @@ class MainWindow(QMainWindow):
         }
         self.hasInitializedCoveredParking = False
 
+
     def init_UI(self,UI_FOLDER):
         uic.loadUi(f"{UI_FOLDER}/main.ui", self)
 
+
     def init_actions(self):
-        self.rfid.returnPressed.connect(self.getRFID)
+        self.rfid.returnPressed.connect(lambda: self.getRFID(int(self.rfid.text())))
+        # self.rfid.returnPressed.connect(self.getRFID)
         self.settingsButton.clicked.connect(self.handleSettings)
-    
+
+
     def init_tables(self):
 
         # Entrance table
@@ -293,7 +301,8 @@ class MainWindow(QMainWindow):
 
         self.exit_table.setTableHeaders(self.DEFAULT_TABLE_HEADERS)
         self.exit_table.tableSetup(self.rowCount)
-    
+
+
     def init_appearance(self):
         TITLES_FONT = self.TITLE["FONT_FAMILY"] 
         TITLES_FONT_SIZE = int(self.TITLE["FONT_SIZE"]) 
@@ -309,6 +318,7 @@ class MainWindow(QMainWindow):
 
         self.covered_parking_title.setFont(QFont(TITLES_FONT, TITLES_FONT_SIZE))
         self.available_space_title.setFont(QFont(TITLES_FONT, TITLES_FONT_SIZE))
+
 
     def init_coveredParking(self):
         # Layout
@@ -327,6 +337,7 @@ class MainWindow(QMainWindow):
             self.coveredParkings[area].setSpaceState(id_area,state)
         
         self.hasInitializedCoveredParking = True
+
 
     def init_parking(self, initial_parking_status):
         self.my_parking = Parking(initial_parking_status)
@@ -355,6 +366,7 @@ class MainWindow(QMainWindow):
         self.manualParkingEntryThread.start()
         self.manualParkingEntryThread.connection_status.connect(self.send_announcement)
         self.parkingLayoutFrame.setLayout(self.my_parking_layout)
+
 
     def get_config(self):
         config = ConfigParser()
@@ -413,6 +425,7 @@ class MainWindow(QMainWindow):
 
 
     def handle_web_socket_reply(self, message):
+        self.retrieveRFID.start_read = True # To let sending of data to start again
         json_message = json.loads(message)
         exist = json_message['exist']
         time = json_message['time']
@@ -466,31 +479,19 @@ class MainWindow(QMainWindow):
         self.announcementLabel.setText(str(message))
         self.announcementLabel.update()
 
+
     # Entry point
-    def getRFID(self):
-        data_str = self.rfid.text()
-        time = datetime.now()
-        timestamp = time.timestamp()
-
-        try:
-            # Convert for faster processing using numpy
-            data = int(data_str)
-        except:
-            self.rfid.clear()
-            return
-
-        self.entrance_entry.removeTimePeriodExpired(timestamp)
+    def getRFID(self, message):
+        message = message.split(',')
+        data = message[0]
+        time = message[1].strip()
+        print(data,time)
 
         if data == "":
             return
-    
-        # Check if rfid has recently entered
-        if not self.entrance_entry.insertEntries(data, timestamp):
-            self.rfid.clear()
-            return
         
         # Dump to JSON
-        message = {"RFID": data_str, "Time": str(time)}
+        message = {"RFID": str(data), "Time": str(time)}
         json_message = json.dumps(message)
 
         self.websocket_worker.send_message(json_message)

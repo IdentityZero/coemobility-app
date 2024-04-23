@@ -1,4 +1,5 @@
 import asyncio
+import csv
 from datetime import datetime
 import json
 from numpy import isin
@@ -170,3 +171,31 @@ class ManualParkingEntryThread(QThread):
             print("Connection timeout")
             return 1
 
+
+class RetrieveRfidEntriesThread(QThread):
+    rfid_data = pyqtSignal(str)
+
+    def __init__(self, rfid_entries_log_location:str = settings.RFID_LOG_FILE_LOCATION):
+        super(RetrieveRfidEntriesThread, self).__init__()
+        self.log_file = str(rfid_entries_log_location)
+        self.start_read = True
+
+    def run(self):
+        while True:
+            time.sleep(0.2)
+
+            if not self.start_read:
+                continue
+
+            with open(self.log_file, 'r') as log_file:
+                lines = log_file.readlines()
+                if not lines:
+                    continue
+                
+                data = lines.pop(0) # Get and remove first line 
+                with open(self.log_file, 'w') as log_file: # Write it back
+                    log_file.writelines(lines)
+                self.rfid_data.emit(data.strip())
+                self.start_read = False
+
+            time.sleep(0.3)

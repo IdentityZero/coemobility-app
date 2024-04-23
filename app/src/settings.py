@@ -12,6 +12,9 @@ STATIC_FOLDER = BASE_DIR / "static"
 MEDIA_FOLDER = BASE_DIR / "media"
 DEFAULT_MEDIA_FOLDER = BASE_DIR / "media"
 
+# RFID Log file location
+RFID_LOG_FILE_LOCATION = BASE_DIR / "rfid_entries.csv"
+
 # Config Location
 CONFIG_FILE = BASE_DIR / "settings.ini"
 config.read(str(CONFIG_FILE))

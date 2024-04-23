@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 import boto3
-from botocore.exceptions import EndpointConnectionError
+# from botocore.exceptions import EndpointConnectionError
 import csv
 from cryptography.fernet import Fernet
 import keyring
@@ -223,7 +223,7 @@ class ImageManagerV2:
 
             return 0
 
-        except EndpointConnectionError:
+        except:
             return 1
 
     def retrievePreviousResourcesList(self):
@@ -269,7 +269,7 @@ class ImageManagerV2:
                 local_file_path = os.path.join(self.media_folder, row.filename)
                 self.s3_client.download_file(self.bucket, row.filename, local_file_path)
                 writer.writerow([row.filename, row.date])
-            except EndpointConnectionError:
+            except:
                 retry_download += 1
                 if retry_download == 3:
                     file.close()

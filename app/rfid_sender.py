@@ -55,6 +55,7 @@ def main(host:str, port:int, log_file_loc:str):
 
     # Create a TCP socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("192.168.1.100",1000))
         # Connect to the remote host
         s.connect((host, port))
         counter = 0

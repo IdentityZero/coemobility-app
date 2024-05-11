@@ -22,7 +22,7 @@ def removeFirstRow(csv_file_path):
 
 async def connect_to_websocket_server():
     uri = "wss://coemobility.com/ws/parking_livec/"
-    csv_path = "rfid_data.csv"
+    csv_path = "rfid_entries.csv"
     async with websockets.connect(uri) as websocket:
         while True:
             # Get user input

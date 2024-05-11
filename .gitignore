@@ -5,6 +5,7 @@ static files/
 package/
 For packaging/
 !requirements.txt
-__pychache__/
+__pycache__/
 *.pyc
 client/
+*.csv

@@ -75,7 +75,6 @@ def main(host:str, port:int, log_file_loc:str):
             if not ENTRIES.insertEntries(data, timestamp):
                 continue
             
-            print(f"{counter} Data: ", data)
             data_time = f"{data}, {time} \n"
             file.write(data_time)
             file.flush()

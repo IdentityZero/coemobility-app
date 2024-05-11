@@ -9,7 +9,6 @@ def getFirstRow(csv_file_path):
     with open(csv_file_path, mode='r') as file:
         reader = csv.reader(file)
         for row in reader:
-            print("Sent first row")
             return row
 
 def removeFirstRow(csv_file_path):

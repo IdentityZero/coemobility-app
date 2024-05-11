@@ -68,6 +68,7 @@ def main(host:str, port:int, log_file_loc:str):
                 continue
 
             data = data.decode()
+            data = f"0000{data}"
             time = datetime.now()
             timestamp = time.timestamp()
             ENTRIES.removeTimePeriodExpired(timestamp)

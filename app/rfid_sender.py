@@ -48,7 +48,7 @@ def rfidIsValid(data:str) -> bool:
 
 def main(host:str, port:int, log_file_loc:str):
 
-    REENTRY_TIME_THRESHOLD = 3 
+    REENTRY_TIME_THRESHOLD = 10
     ENTRIES = Entry(REENTRY_TIME_THRESHOLD)
 
     file = open(log_file_loc, mode='a')

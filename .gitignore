@@ -7,6 +7,9 @@ For packaging/
 !requirements.txt
 __pycache__/
 *.pyc
+**/*.pyc
+**/*.txt
 client/
 *.csv
+**/*.csv
 media/

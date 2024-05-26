@@ -504,6 +504,8 @@ class MainWindow(QMainWindow):
         
         if data.strip('0') == "":
             # Guest
+            self.send_announcement("A visitor with unknown vehicle crossed!")
+            self.alarm.play()
             return
         
         # Dump to JSON

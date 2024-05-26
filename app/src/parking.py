@@ -123,7 +123,7 @@ def coveredParkingNames():
         #         with open(save_path, 'wb') as f:
         #             f.write(response.content)
 
-        return details
+        return details['results']
     
     return []
 
@@ -212,4 +212,5 @@ class CoveredParkingSpace(QVBoxLayout):
         self.addWidget(self.icon)
 
 if __name__ == "__main__":
-    pass
+    val = coveredParkingNames()
+    print(val)

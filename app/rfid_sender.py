@@ -1,6 +1,7 @@
 from datetime import datetime
 import socket
 import numpy as np
+from pathlib import Path
 
 # TODO
 # Error handling
@@ -76,7 +77,7 @@ def main(host:str, port:int, log_file_loc:str):
             if not ENTRIES.insertEntries(data, timestamp):
                 continue
             
-            data_time = f"{data}, {time} \n"
+            data_time = f"{data},{time}\n"
             file.write(data_time)
             file.flush()
 
@@ -88,9 +89,10 @@ if __name__ == "__main__":
     # HOST_RFID_IP = '192.168.100.100'
     HOST_RFID_PORT = 12345
 
-    ENTRY_LOG_FILE = "rfid_entries.csv"
+    BASE_PATH = Path.cwd()
+    ENTRY_LOG_FILE = f"{BASE_PATH}/rfid_entries.csv"
 
-    main(HOST_RFID_IP, HOST_RFID_PORT,ENTRY_LOG_FILE)
+    # main(HOST_RFID_IP, HOST_RFID_PORT,ENTRY_LOG_FILE)
 
 
 

@@ -55,7 +55,7 @@ def main(host:str, port:int, log_file_loc:str):
 
     # Create a TCP socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("192.168.1.100",1000))
+        # s.bind(("192.168.100.144",1000))
         # Connect to the remote host
         s.connect((host, port))
         counter = 0
@@ -84,10 +84,13 @@ def main(host:str, port:int, log_file_loc:str):
 
 
 if __name__ == "__main__":
-    HOST_RFID_IP = '192.168.1.200'
-    HOST_RFID_PORT = 2000
+    HOST_RFID_IP = '192.168.1.100'
+    # HOST_RFID_IP = '192.168.100.100'
+    HOST_RFID_PORT = 12345
 
     ENTRY_LOG_FILE = "rfid_entries.csv"
 
     main(HOST_RFID_IP, HOST_RFID_PORT,ENTRY_LOG_FILE)
+
+
 

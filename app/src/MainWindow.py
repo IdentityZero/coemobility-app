@@ -1,6 +1,6 @@
 # External Libraries
 from configparser import ConfigParser
-from datetime import datetime
+from datetime import date, datetime
 import json
 from queue import Queue
 import requests
@@ -9,9 +9,10 @@ import time
 import sys
 
 from PyQt5 import uic
-from PyQt5.QtCore import QResource
+from PyQt5.QtCore import QResource,QPropertyAnimation
 from PyQt5.QtGui import QFont, QMovie
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtMultimedia import QSound
+from PyQt5.QtWidgets import QMainWindow, QApplication,QGraphicsOpacityEffect
 
 import settings
 
@@ -282,14 +283,17 @@ class MainWindow(QMainWindow):
         }
         self.hasInitializedCoveredParking = False
 
+        self.alarm = QSound(f"{settings.STATIC_FOLDER}/intruder_alarm.wav")
+
 
     def init_UI(self,UI_FOLDER):
         uic.loadUi(f"{UI_FOLDER}/main.ui", self)
 
+        self.opacity_effect = QGraphicsOpacityEffect()
+        self.announcementLabel.setGraphicsEffect(self.opacity_effect)
+
 
     def init_actions(self):
-        self.rfid.returnPressed.connect(lambda: self.getRFID(int(self.rfid.text())))
-        # self.rfid.returnPressed.connect(self.getRFID)
         self.settingsButton.clicked.connect(self.handleSettings)
 
 
@@ -460,6 +464,8 @@ class MainWindow(QMainWindow):
                 {"column_position": self.DEFAULT_TABLE_HEADERS["Time"]["column_position"], "type": "text", "value": time[:-4]},
                 {"column_position": self.DEFAULT_TABLE_HEADERS["Name"]["column_position"], "type": "text", "value": "Unknown"},
             ]
+            self.alarm.play()
+            self.send_announcement("Intruder Alert! An intruder crossed!")
         
         if status == "ENTRANCE":
             self.entrance_table.setTableItem(dict_data)
@@ -478,6 +484,13 @@ class MainWindow(QMainWindow):
         self.announcementLabel.show()
         self.announcementLabel.setText(str(message))
         self.announcementLabel.update()
+        self.animation = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.animation.setDuration(5000)  # 5 seconds
+        self.animation.setStartValue(1)   # Start fully visible
+        self.animation.setEndValue(0)     # End fully transparent
+
+        # Start the animation
+        self.animation.start()
 
 
     # Entry point
@@ -485,9 +498,12 @@ class MainWindow(QMainWindow):
         message = message.split(',')
         data = message[0]
         time = message[1].strip()
-        print(data,time)
 
         if data == "":
+            return
+        
+        if data.strip('0') == "":
+            # Guest
             return
         
         # Dump to JSON
@@ -495,8 +511,6 @@ class MainWindow(QMainWindow):
         json_message = json.dumps(message)
 
         self.websocket_worker.send_message(json_message)
-
-        self.rfid.clear()
 
 
 if __name__ == "__main__":

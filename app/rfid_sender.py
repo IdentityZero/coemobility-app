@@ -85,14 +85,16 @@ def main(host:str, port:int, log_file_loc:str):
 
 
 if __name__ == "__main__":
-    HOST_RFID_IP = '192.168.1.100'
-    # HOST_RFID_IP = '192.168.100.100'
+    # This devices IP is 192.168.1.100
+    # The IP where to get the RFID Data is 192.168.1.200
+    HOST_RFID_IP = '192.168.1.200'
+    # HOST_RFID_IP = '192.168.100.200'
     HOST_RFID_PORT = 12345
 
     BASE_PATH = Path.cwd()
     ENTRY_LOG_FILE = f"{BASE_PATH}/rfid_entries.csv"
 
-    # main(HOST_RFID_IP, HOST_RFID_PORT,ENTRY_LOG_FILE)
+    main(HOST_RFID_IP, HOST_RFID_PORT,ENTRY_LOG_FILE)
 
 
 
